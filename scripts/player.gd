@@ -14,8 +14,9 @@ var is_locked = false
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var camera_mount = $CameraMount
-@onready var animation_player = $Visuals/mixamo_base/AnimationPlayer
-@onready var visuals = $Visuals
+@onready var animation_player = $visuals/AnimationPlayer
+@onready var visuals = $visuals
+
 
 
 var sens_horizontal = 0.2
@@ -39,9 +40,9 @@ func _physics_process(delta):
 		is_locked = false
 	
 	# Handle kick
-	if Input.is_action_just_pressed("kick") and is_on_floor():
-		if animation_player.current_animation != "kick":
-			animation_player.play("kick")
+	if Input.is_action_just_pressed("jab") and is_on_floor():
+		if animation_player.current_animation != "jab":
+			animation_player.play("jab")
 			is_locked = true
 	
 	# Handle run.
@@ -57,8 +58,12 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 
 	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+	if Input.is_action_just_pressed("jump") and is_on_floor():
+		print("jump")
+		if animation_player.current_animation != "jump":
+			animation_player.play("jump")
+			is_locked = true
+		#velocity.y = JUMP_VELOCITY # this should be applied to mesh as well to actually get top velocity
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -67,12 +72,12 @@ func _physics_process(delta):
 	if direction and is_on_floor():
 		if !is_locked:
 			if is_running:
-				if animation_player.current_animation != "running":
-					animation_player.play("running")
+				if animation_player.current_animation != "run":
+					animation_player.play("run")
 			else:
-				if animation_player.current_animation != "walking":
-					animation_player.play("walking")
-			visuals.look_at(position + direction) # set visuals relative to direction
+				if animation_player.current_animation != "walk":
+					animation_player.play("walk")
+			visuals.look_at(position + direction)
 			
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
